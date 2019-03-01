@@ -178,6 +178,8 @@ class DatabaseWriter(RobotDatabase):
         self._connection.execute(sql_statement)
 
     def fetch_id(self, table_name, criteria):
+        sql_statement = 'SELECT id FROM %s WHERE ' % table_name
+        sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
         res = self._connection.execute(sql_statement, criteria.values()).fetchone()
         if not res:
             raise Exception('Query did not yield id, even though it should have.'
