@@ -39,10 +39,10 @@ class DatabaseWriter(RobotDatabase):
     def _create_table_test_runs(self):
         self._create_table('test_runs', {
             'hash': 'TEXT NOT NULL',
-            'imported_at': 'DATETIME NOT NULL',
+            'imported_at': 'TIMESTAMP NOT NULL',
             'source_file': 'TEXT',
-            'started_at': 'DATETIME',
-            'finished_at': 'DATETIME',
+            'started_at': 'TIMESTAMP',
+            'finished_at': 'TIMESTAMP',
         }, ('hash',))
 
     def _create_table_test_run_status(self):
@@ -178,8 +178,6 @@ class DatabaseWriter(RobotDatabase):
         self._connection.execute(sql_statement)
 
     def fetch_id(self, table_name, criteria):
-        sql_statement = 'SELECT id FROM %s WHERE ' % table_name
-        sql_statement += ' AND '.join('%s=?' % key for key in criteria.keys())
         res = self._connection.execute(sql_statement, criteria.values()).fetchone()
         if not res:
             raise Exception('Query did not yield id, even though it should have.'
@@ -188,12 +186,12 @@ class DatabaseWriter(RobotDatabase):
 
     def insert(self, table_name, criteria):
         sql_statement = self._format_insert_statement(table_name, criteria.keys())
-        cursor = self._connection.execute(sql_statement, criteria.values())
+        cursor = self._connection.execute(sql_statement, tuple(criteria.values()))
         return cursor.lastrowid
 
     def insert_or_ignore(self, table_name, criteria):
         sql_statement = self._format_insert_statement(table_name, criteria.keys(), 'IGNORE')
-        self._connection.execute(sql_statement, criteria.values())
+        self._connection.execute(sql_statement, tuple(criteria.values()))
 
     def insert_many_or_ignore(self, table_name, column_names, values):
         sql_statement = self._format_insert_statement(table_name, column_names, 'IGNORE')
