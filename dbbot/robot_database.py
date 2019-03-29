@@ -25,7 +25,7 @@ class RobotDatabase(object):
 
     def _connect(self, db_file_path):
         self._verbose('- Establishing database connection')
-        return sqlite3.connect(db_file_path)
+        return sqlite3.connect(db_file_path, detect_types=sqlite3.PARSE_DECLTYPES)
 
     def _configure(self):
         self._set_pragma('page_size', 4096)
