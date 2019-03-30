@@ -27,8 +27,12 @@ class DbBot(object):
         verbose_stream = sys.stdout if self._options.be_verbose else None
         # '' for temporary database i.e. deleted after the connection is closed
         # see: http://www.sqlite.org/inmemorydb.html, section 'Temporary Databases'
-        database_path = '' if self._options.dry_run else self._options.db_file_path
-        self._db = DatabaseWriter(database_path, verbose_stream)
+        ## TODO: attivare dry-run database_path = '' if self._options.dry_run else self._options.db_file_path
+        self._db = DatabaseWriter(host=self._options.db_host,
+                                  user=self._options.db_user,
+                                  password=self._options.db_passwd,
+                                  database=self._options.db_name,
+                                  verbose_stream=verbose_stream)
         self._parser = RobotResultsParser(
             self._options.include_keywords,
             self._db,

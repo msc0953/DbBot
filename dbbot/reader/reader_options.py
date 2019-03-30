@@ -15,7 +15,7 @@ from optparse import OptionParser
 from os.path import exists
 
 
-DEFAULT_DB_NAME = 'robot_results.db'
+DEFAULT_DB_NAME = 'robot_results'
 
 class ReaderOptions(object):
 
@@ -31,6 +31,18 @@ class ReaderOptions(object):
                                  'dest': 'dry_run',
                                  'help': 'do everything except store results into disk'}),
 
+            ('-H', '--host', {'dest': 'db_host',
+                              'default': 'localhost',
+                              'help': 'host where Mysql is running'}),
+
+            ('-u', '--user', {'dest': 'db_user',
+                              'default': 'root',
+                              'help': 'username to connect to Mysql'}),
+
+            ('-p', '--password', {'dest': 'db_passwd',
+                                  'default': '',
+                                  'help': 'password to connect to Mysql'}),
+
             ('-k', '--also-keywords', {'action':'store_true',
                                        'default': False,
                                        'dest': 'include_keywords',
@@ -41,9 +53,9 @@ class ReaderOptions(object):
                                  'dest': 'be_verbose',
                                  'help': 'be verbose about the operation'}),
 
-            ('-b', '--database', {'dest': 'db_file_path',
+            ('-b', '--database', {'dest': 'db_name',
                                   'default': DEFAULT_DB_NAME,
-                                  'help': 'path to the SQLite database for test run results'})
+                                  'help': 'name of the MySQL database for test run results'})
         ]
         for option in options:
             self._parser.add_option(option[0], option[1], **option[2])
@@ -65,8 +77,20 @@ class ReaderOptions(object):
         exit(1)
 
     @property
-    def db_file_path(self):
-        return self._options.db_file_path
+    def db_host(self):
+        return self._options.db_host
+
+    @property
+    def db_user(self):
+        return self._options.db_user
+
+    @property
+    def db_passwd(self):
+        return self._options.db_passwd
+
+    @property
+    def db_name(self):
+        return self._options.db_name
 
     @property
     def be_verbose(self):

@@ -11,27 +11,30 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-import sqlite3
+import mysql.connector
 
 from .logger import Logger
 
 
 class RobotDatabase(object):
 
-    def __init__(self, db_file_path, verbose_stream):
+    def __init__(self, host='localhost', database='mysql', user='root', password='', verbose_stream=None):
         self._verbose = Logger('Database', verbose_stream)
-        self._connection = self._connect(db_file_path)
+        self.database = database
+        self._connection = self._connect(host, database, user, password)
         self._configure()
 
-    def _connect(self, db_file_path):
-        self._verbose('- Establishing database connection')
-        return sqlite3.connect(db_file_path, detect_types=sqlite3.PARSE_DECLTYPES)
+    def _connect(self, host='localhost', database='mysql', user='root', password=''):
+        self._verbose('- Establishing MySQL database connection')
+        return mysql.connector.connect(host=host, user=user, password=password)
 
     def _configure(self):
-        self._set_pragma('page_size', 4096)
-        self._set_pragma('cache_size', 10000)
-        self._set_pragma('synchronous', 'NORMAL')
-        self._set_pragma('journal_mode', 'WAL')
+        self._connection.cursor().execute("CREATE DATABASE IF NOT EXISTS %s" % self.database)
+        self._connection.database = self.database
+        # self._set_pragma('page_size', 4096)
+        # self._set_pragma('cache_size', 10000)
+        # self._set_pragma('synchronous', 'NORMAL')
+        # self._set_pragma('journal_mode', 'WAL')
 
     def _set_pragma(self, name, value):
         sql_statement = 'PRAGMA %s=%s' % (name, value)
